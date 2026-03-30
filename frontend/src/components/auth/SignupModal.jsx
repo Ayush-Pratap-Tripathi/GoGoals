@@ -3,9 +3,14 @@ import { X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo.png';
 
 const SignupModal = ({ isOpen, onClose, switchToLogin }) => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,12 +33,14 @@ const SignupModal = ({ isOpen, onClose, switchToLogin }) => {
         password: formData.password
       });
       
-      localStorage.setItem('userToken', response.data.token);
-      localStorage.setItem('userData', JSON.stringify({
+      const userData = {
         id: response.data._id,
         name: response.data.name,
         email: response.data.email
-      }));
+      };
+
+      // Set global auth state and persist JWT
+      login(userData, response.data.token);
 
       toast.success('User registered successfully!', {
         style: {
@@ -46,6 +53,7 @@ const SignupModal = ({ isOpen, onClose, switchToLogin }) => {
       });
 
       onClose();
+      navigate('/dashboard');
     } catch (error) {
       console.error("Auth Error:", error);
       const message = error.response?.data?.message || 'An error occurred. Please try again.';

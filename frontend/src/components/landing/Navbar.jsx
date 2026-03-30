@@ -21,7 +21,7 @@ const Navbar = ({ openAuthModal }) => {
       className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between backdrop-blur-md bg-[#292d44]/80 border-b border-white/10"
     >
       <Link to="/" onClick={handleLogoClick} className="flex items-center gap-3 group cursor-pointer">
-        <img src={logo} alt="GoGoals Logo" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform duration-300" />
+        <img src={logo} alt="GoGoals Logo" className="w-12 h-auto object-contain group-hover:scale-110 transition-transform duration-300" />
         <span className="text-2xl font-bold tracking-wide group-hover:text-yellow-400 transition-colors duration-300">GoGoals</span>
       </Link>
       <div className="flex items-center gap-4">

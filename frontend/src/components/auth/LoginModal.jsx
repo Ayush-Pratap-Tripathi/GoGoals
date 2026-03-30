@@ -3,9 +3,14 @@ import { X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo.png';
 
 const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,12 +32,13 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
         password: formData.password
       });
       
-      localStorage.setItem('userToken', response.data.token);
-      localStorage.setItem('userData', JSON.stringify({
+      const userData = {
         id: response.data._id,
         name: response.data.name,
         email: response.data.email
-      }));
+      };
+
+      login(userData, response.data.token);
 
       toast.success('Logged in successfully!', {
         style: {
@@ -45,6 +51,7 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
       });
 
       onClose();
+      navigate('/dashboard');
     } catch (error) {
       console.error("Auth Error:", error);
       const message = error.response?.data?.message || 'An error occurred. Please try again.';

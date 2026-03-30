@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @layer base {
+  html {
+    font-size: 20px; /* 1.25x scale applied globally matching a direct browser zoom perfectly */
+  }
   body {
     background-color: #292d44;
     color: #ffffff;

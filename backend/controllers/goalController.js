@@ -114,7 +114,13 @@ export const getGoalProgress = async (req, res) => {
           _id: "$category",
           total: { $sum: 1 },
           completed: { 
-            $sum: { $cond: [{ $eq: ["$isCompleted", true] }, 1, 0] } 
+            $sum: { 
+              $cond: [
+                { $and: [{ $eq: ["$isCompleted", true] }, { $eq: ["$isDeleted", false] }] }, 
+                1, 
+                0
+              ] 
+            } 
           },
           deleted: {
             $sum: { $cond: [{ $eq: ["$isDeleted", true] }, 1, 0] }
@@ -134,7 +140,7 @@ export const getGoalProgress = async (req, res) => {
       }
       return {
         category: stat._id,
-        score: score.toFixed(1), // Formatted to 1 decimal place max
+        score: score.toFixed(2), // Formatted strictly to 2 decimal places per user formulation rule
         totalTasksCreated: stat.total,
         totalCompleted: stat.completed,
         totalDeleted: stat.deleted,
