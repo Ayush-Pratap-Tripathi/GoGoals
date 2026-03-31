@@ -20,6 +20,10 @@ const goalSchema = mongoose.Schema(
       required: [true, 'Please add a category'],
       enum: ['daily', 'weekly', 'monthly', 'yearly', 'bucket'],
     },
+    scheduledDate: {
+      type: String,
+      default: null, // Resolves HTML5 Dates like "YYYY-MM", "YYYY-W##" securely preventing timezone conversion drift
+    },
     isCompleted: {
       type: Boolean,
       required: true,

@@ -4,6 +4,7 @@ import logo from '../assets/logo.png';
 import StatCard from '../components/dashboard/StatCard';
 import ChartBlock from '../components/dashboard/ChartBlock';
 import GoalModal from '../components/dashboard/GoalModal';
+import GoalCreateModal from '../components/dashboard/GoalCreateModal';
 import toast from 'react-hot-toast';
 import { Plus } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
@@ -12,6 +13,22 @@ import axios from 'axios';
 
 const DashboardPage = () => {
   const { token } = useContext(AuthContext);
+
+  // Core Chronological Native Mapping (Resolves Client OS Timezone strictly uniformly matching HTML5 inputs)
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+  const currentDay = String(today.getDate()).padStart(2, '0');
+  
+  const todayStr = `${currentYear}-${currentMonth}-${currentDay}`; // e.g., '2026-03-31'
+  const thisMonthStr = `${currentYear}-${currentMonth}`;         // e.g., '2026-03'
+
+  // ISO Week Matcher (Synchronized exactly to <input type="week"> physics)
+  const d = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+  const thisWeekStr = `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`; // e.g., '2026-W14'
 
   // Bind active statistics fetched natively from aggregating Node route
   const [goalStats, setGoalStats] = useState({
@@ -23,37 +40,35 @@ const DashboardPage = () => {
   const [allGoals, setAllGoals] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('daily');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const fetchDashboardData = async () => {
     if (!token) return;
     try {
       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       
-      const [progressRes, goalsRes] = await Promise.all([
-        axios.get(`${apiBase}/goals/progress`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${apiBase}/goals`, { headers: { Authorization: `Bearer ${token}` } })
-      ]);
+      const goalsRes = await axios.get(`${apiBase}/goals`, { headers: { Authorization: `Bearer ${token}` } });
+      const goals = goalsRes.data;
 
-      const updatedStats = {
-        daily: { completed: 0, total: 0, score: "0.00" },
-        weekly: { completed: 0, total: 0, score: "0.00" },
-        monthly: { completed: 0, total: 0, score: "0.00" }
+      // Advanced Node Filtering strictly isolating active local chronological limits mapped from user targets
+      const currentDaily = goals.filter(g => g.category === 'daily' && g.scheduledDate === todayStr && !g.isDeleted);
+      const currentWeekly = goals.filter(g => g.category === 'weekly' && g.scheduledDate === thisWeekStr && !g.isDeleted);
+      const currentMonthly = goals.filter(g => g.category === 'monthly' && g.scheduledDate === thisMonthStr && !g.isDeleted);
+
+      // Mathematical Prop Generation bypassing backend aggregates preventing future timezone-drifting exploits natively
+      const processStats = (arr) => {
+        const total = arr.length;
+        const completed = arr.filter(g => g.isCompleted).length;
+        return { completed, total, score: total > 0 ? ((completed / total) * 10).toFixed(2) : "0.00" };
       };
 
-      if (Array.isArray(progressRes.data)) {
-        progressRes.data.forEach(stat => {
-          if (updatedStats[stat.category]) {
-            updatedStats[stat.category] = {
-              completed: stat.totalCompleted,
-              total: stat.activeTasks,
-              score: stat.score
-            };
-          }
-        });
-      }
+      setGoalStats({
+        daily: processStats(currentDaily),
+        weekly: processStats(currentWeekly),
+        monthly: processStats(currentMonthly)
+      });
       
-      setGoalStats(updatedStats);
-      setAllGoals(goalsRes.data);
+      setAllGoals(goals);
 
     } catch (error) {
       console.error("Failed fetching dashboard aggregation stats:", error);
@@ -89,11 +104,11 @@ const DashboardPage = () => {
     } catch (error) { toast.error("Failed to delete task."); }
   };
 
-  const handleAddGoal = async (category, title) => {
+  const handleAddGoal = async (category, title, scheduledDate = null) => {
     try {
       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       await axios.post(`${apiBase}/goals`, 
-        { category, title },
+        { category, title, scheduledDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Task added successfully!", {
@@ -202,16 +217,33 @@ const DashboardPage = () => {
       </div>
 
       {/* FLOATING ACTION BUTTON */}
-      <button className="absolute bottom-20 md:bottom-24 right-6 md:right-10 w-14 h-14 bg-[#3b82f6] hover:bg-[#2563eb] hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white">
+      <button 
+        onClick={() => setIsCreateModalOpen(true)}
+        className="absolute bottom-20 md:bottom-24 right-6 md:right-10 w-14 h-14 bg-[#3b82f6] hover:bg-[#2563eb] hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white"
+        title="Create New Goal"
+      >
         <Plus className="w-7 h-7" />
       </button>
+
+      {/* DYNAMIC GOAL CREATION UI OVERLAY */}
+      <GoalCreateModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onAdd={handleAddGoal}
+      />
 
       {/* DYNAMIC GOAL MANAGEMENT UI OVERLAY */}
       <GoalModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         category={activeCategory}
-        goals={allGoals.filter(goal => goal.category === activeCategory)}
+        goals={allGoals.filter(goal => 
+             goal.category === activeCategory && 
+             !goal.isDeleted &&
+             (activeCategory === 'daily' ? goal.scheduledDate === todayStr :
+              activeCategory === 'weekly' ? goal.scheduledDate === thisWeekStr :
+              activeCategory === 'monthly' ? goal.scheduledDate === thisMonthStr : true)
+        )}
         onToggle={handleToggleGoal}
         onDelete={handleDeleteGoal}
         onAdd={handleAddGoal}

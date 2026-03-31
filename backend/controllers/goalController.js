@@ -18,7 +18,7 @@ export const getGoals = async (req, res) => {
 // @access  Private
 export const setGoal = async (req, res) => {
   try {
-    const { title, description, category } = req.body;
+    const { title, description, category, scheduledDate } = req.body;
 
     if (!title || !category) {
       return res.status(400).json({ message: 'Please add a title and category' });
@@ -28,6 +28,7 @@ export const setGoal = async (req, res) => {
       title,
       description,
       category,
+      scheduledDate, // Plugs identical string matching HTML5 form into DB record securely
       user: req.user.id,
     });
 

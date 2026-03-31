@@ -1,7 +1,7 @@
 import logo from '../../assets/logo.png';
 import { useContext, useState, useRef, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { UserCircle2, LogOut, Settings } from 'lucide-react';
+import { UserCircle2, LogOut, Settings, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -98,6 +98,13 @@ const DashboardNavbar = () => {
 
               {/* Action Routes */}
               <div className="flex flex-col py-2">
+                <button 
+                  onClick={() => setIsDropdownOpen(false)}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-3 outline-none"
+                >
+                  <Target className="w-4 h-4 text-blue-400" />
+                  My Goals
+                </button>
                 <button 
                   onClick={() => setIsDropdownOpen(false)}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-3 outline-none"
