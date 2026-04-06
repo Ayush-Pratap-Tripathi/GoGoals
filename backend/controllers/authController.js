@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import Goal from '../models/Goal.js';
 
 // Generate JWT
 const generateToken = (id) => {
@@ -38,6 +39,7 @@ export const registerUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
+        profilePicture: user.profilePicture,
         token: generateToken(user._id),
       });
     } else {
@@ -62,6 +64,7 @@ export const loginUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
+        profilePicture: user.profilePicture,
         token: generateToken(user._id),
       });
     } else {
@@ -77,4 +80,95 @@ export const loginUser = async (req, res) => {
 // @access  Private
 export const getMe = async (req, res) => {
   res.status(200).json(req.user);
+};
+
+// @desc    Update user name
+// @route   PUT /api/auth/profile/name
+// @access  Private
+export const updateName = async (req, res) => {
+  try {
+    if (!req.body) {
+      return res.status(400).json({ message: 'Request body is missing or invalid content-type. Please use application/json.' });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      if (req.body.name) {
+        user.name = req.body.name;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        profilePicture: updatedUser.profilePicture,
+        token: generateToken(updatedUser._id),
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update user profile picture
+// @route   PUT /api/auth/profile/avatar
+// @access  Private
+export const updateProfilePicture = async (req, res) => {
+  try {
+    if (!req.body) {
+      return res.status(400).json({ message: 'Request body is missing or invalid content-type. Please use application/json.' });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      if (req.body.profilePicture !== undefined) {
+        user.profilePicture = req.body.profilePicture;
+      } else {
+        return res.status(400).json({ message: "profilePicture field is required." });
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        profilePicture: updatedUser.profilePicture,
+        token: generateToken(updatedUser._id),
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete user account and data
+// @route   DELETE /api/auth/profile
+// @access  Private
+export const deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Must delete all goals related to this user first
+    await Goal.deleteMany({ user: req.user._id });
+
+    // Then delete user
+    await user.deleteOne();
+
+    res.status(200).json({ message: 'Account and associated data deleted securely.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

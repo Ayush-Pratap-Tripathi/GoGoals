@@ -1,14 +1,16 @@
 import logo from '../../assets/logo.png';
 import { useContext, useState, useRef, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { UserCircle2, LogOut, Settings, Target } from 'lucide-react';
+import { UserCircle2, LogOut, Settings, Target, ListChecks } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import BucketListModal from './BucketListModal';
 
 const DashboardNavbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isBucketModalOpen, setIsBucketModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   
   // Extract first name dynamically from auth payload (split by space)
@@ -40,11 +42,12 @@ const DashboardNavbar = () => {
   };
 
   return (
-    <motion.nav 
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="flex items-center justify-between w-full py-4 max-w-7xl mx-auto relative z-50"
-    >
+    <>
+      <motion.nav 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="flex items-center justify-between w-full py-4 max-w-7xl mx-auto relative z-50"
+      >
       {/* Left: Responsive Clickable Logo */}
       <Link to="/" className="flex items-center gap-2 group cursor-pointer transition-all outline-none">
         <img 
@@ -75,9 +78,13 @@ const DashboardNavbar = () => {
         
         <div 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-all outline-none border ${isDropdownOpen ? 'bg-white/20 border-white/40 scale-105' : 'bg-white/10 border-transparent hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95'}`}
+          className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-all outline-none border overflow-hidden ${isDropdownOpen ? 'bg-white/20 border-white/40 scale-105' : 'bg-white/10 border-transparent hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95'}`}
         >
-          <UserCircle2 className="w-6 h-6 text-white" />
+          {user?.profilePicture ? (
+            <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <UserCircle2 className="w-6 h-6 text-white" />
+          )}
         </div>
 
         {/* Floating Glassmorphic Dropdown Menu */}
@@ -99,14 +106,30 @@ const DashboardNavbar = () => {
               {/* Action Routes */}
               <div className="flex flex-col py-2">
                 <button 
-                  onClick={() => setIsDropdownOpen(false)}
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    navigate('/goals');
+                  }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-3 outline-none"
                 >
                   <Target className="w-4 h-4 text-blue-400" />
                   My Goals
                 </button>
                 <button 
-                  onClick={() => setIsDropdownOpen(false)}
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    setIsBucketModalOpen(true);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-3 outline-none"
+                >
+                  <ListChecks className="w-4 h-4 text-purple-400" />
+                  Bucket List
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    navigate('/profile');
+                  }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-3 outline-none"
                 >
                   <Settings className="w-4 h-4 text-gray-400" />
@@ -126,6 +149,8 @@ const DashboardNavbar = () => {
 
       </div>
     </motion.nav>
+    <BucketListModal isOpen={isBucketModalOpen} onClose={() => setIsBucketModalOpen(false)} />
+    </>
   );
 };
 

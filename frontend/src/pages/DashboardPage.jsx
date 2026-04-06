@@ -5,6 +5,7 @@ import StatCard from '../components/dashboard/StatCard';
 import ChartBlock from '../components/dashboard/ChartBlock';
 import GoalModal from '../components/dashboard/GoalModal';
 import GoalCreateModal from '../components/dashboard/GoalCreateModal';
+import { generateWeeklyChart, generateMonthlyChart, generateYearlyChart, generateDecadeChart } from '../utils/chartHelpers';
 import toast from 'react-hot-toast';
 import { Plus } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
@@ -41,6 +42,12 @@ const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('daily');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Time Travel Gesture State Limit trackers
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
+  const [yearOffset, setYearOffset] = useState(0);
+  const [decadeOffset, setDecadeOffset] = useState(0);
 
   const fetchDashboardData = async () => {
     if (!token) return;
@@ -118,27 +125,11 @@ const DashboardPage = () => {
     } catch (error) { toast.error("Failed to add task."); }
   };
 
-  const weekData = [
-    { name: 'Monday', value: 0 }, { name: 'Tuesday', value: 0 },
-    { name: 'Wednesday', value: 0 }, { name: 'Thursday', value: 0 },
-    { name: 'Friday', value: 0 }, { name: 'Saturday', value: 0 }, { name: 'Sunday', value: 0 }
-  ];
-
-  const monthData = Array.from({ length: 31 }, (_, i) => ({ name: (i + 1).toString(), value: 0 }));
-
-  const yearData = [
-    { name: 'January', value: 0 }, { name: 'February', value: 0 }, { name: 'March', value: 0 },
-    { name: 'April', value: 0 }, { name: 'May', value: 0 }, { name: 'June', value: 0 },
-    { name: 'July', value: 0 }, { name: 'August', value: 0 }, { name: 'September', value: 0 },
-    { name: 'October', value: 0 }, { name: 'November', value: 0 }, { name: 'December', value: 0 }
-  ];
-
-  const yearlyProgressData = [
-    { name: '2016', value: 0 }, { name: '2017', value: 0 }, { name: '2018', value: 0 },
-    { name: '2019', value: 0 }, { name: '2020', value: 0 }, { name: '2021', value: 0 },
-    { name: '2022', value: 0 }, { name: '2023', value: 0 }, { name: '2024', value: 0 },
-    { name: '2025', value: 0 }
-  ];
+  // Dynamically resolve array filters directly out of native App Memory strictly mapping mathematical limit calculations preventing excess DB calls
+  const weeklyDataNode = generateWeeklyChart(weekOffset, allGoals);
+  const monthlyDataNode = generateMonthlyChart(monthOffset, allGoals);
+  const yearlyDataNode = generateYearlyChart(yearOffset, allGoals);
+  const decadeDataNode = generateDecadeChart(decadeOffset, allGoals);
 
   return (
     <div className="bg-[#292d44] h-screen w-full flex flex-col font-sans overflow-hidden text-white relative">
@@ -183,16 +174,36 @@ const DashboardPage = () => {
 
         {/* CHARTS CONTAINER */}
         <div className="w-full max-w-7xl mx-auto flex flex-col gap-16 px-4 md:px-10 mt-10">
-          <ChartBlock title="This Week" data={weekData} />
+          <ChartBlock 
+            title={weeklyDataNode.title} 
+            data={weeklyDataNode.data} 
+            onPrevious={() => setWeekOffset(prev => prev - 1)}
+            onNext={() => setWeekOffset(prev => prev + 1)}
+          />
           
           <div className="w-full h-[1px] bg-white/5" />
-          <ChartBlock title="This Month" data={monthData} />
+          <ChartBlock 
+            title={monthlyDataNode.title} 
+            data={monthlyDataNode.data} 
+            onPrevious={() => setMonthOffset(prev => prev - 1)}
+            onNext={() => setMonthOffset(prev => prev + 1)}
+          />
           
           <div className="w-full h-[1px] bg-white/5" />
-          <ChartBlock title="This Year" data={yearData} />
+          <ChartBlock 
+            title={yearlyDataNode.title} 
+            data={yearlyDataNode.data} 
+            onPrevious={() => setYearOffset(prev => prev - 1)}
+            onNext={() => setYearOffset(prev => prev + 1)}
+          />
           
           <div className="w-full h-[1px] bg-white/5" />
-          <ChartBlock title="Yearly Progress" data={yearlyProgressData} />
+          <ChartBlock 
+            title={decadeDataNode.title} 
+            data={decadeDataNode.data} 
+            onPrevious={() => setDecadeOffset(prev => prev - 1)}
+            onNext={() => setDecadeOffset(prev => prev + 1)}
+          />
         </div>
 
         {/* FULL SCREEN MOTIVATIONAL TAIL */}
