@@ -40,7 +40,8 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
 
       login(userData, response.data.token);
 
-      const toastId = toast.success('Logged in successfully!', {
+      toast.success('Logged in successfully!', {
+        duration: 2000,
         style: {
           borderRadius: '10px',
           background: '#292d44',
@@ -52,15 +53,16 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
 
       onClose();
       
-      // Dismiss toast and navigate after a brief delay
+      // Navigate after delay to allow toast to be visible
       setTimeout(() => {
-        toast.dismiss(toastId);
+        toast.remove();
         navigate('/dashboard');
-      }, 2000);
+      }, 2500);
     } catch (error) {
       console.error("Auth Error:", error);
       const message = error.response?.data?.message || 'An error occurred. Please try again.';
       toast.error(message, {
+        duration: 3000,
         style: { borderRadius: '10px', background: '#ef4444', color: '#fff' },
       });
     } finally {
