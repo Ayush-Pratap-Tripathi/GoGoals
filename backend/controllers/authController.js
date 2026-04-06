@@ -155,10 +155,22 @@ export const updateProfilePicture = async (req, res) => {
 // @access  Private
 export const deleteAccount = async (req, res) => {
   try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required to delete account' });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify password
+    const isPasswordCorrect = await user.matchPassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: 'Incorrect password, you have been logged out.' });
     }
 
     // Must delete all goals related to this user first

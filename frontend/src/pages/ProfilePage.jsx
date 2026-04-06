@@ -26,6 +26,7 @@ const ProfilePage = () => {
   // Deletion Modal State
   const [deleteStep, setDeleteStep] = useState(0); 
   const [deleteInput, setDeleteInput] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const exactPhrase = `I'm ${user?.name} and I am deleting my account on GoGoals.`;
 
@@ -142,17 +143,31 @@ const ProfilePage = () => {
       toast.error("Exact phrase match required.");
       return;
     }
+    
+    if (!deletePassword) {
+      toast.error("Password is required.");
+      return;
+    }
+
     setIsDeleting(true);
     try {
       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       await axios.delete(`${apiBase}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        data: { password: deletePassword }
       });
+
       toast.success("Account permanently deleted.");
       logout();
       navigate('/');
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete account.");
+      if (error.response?.status === 401) {
+        toast.error("Incorrect password, you've been logged out");
+        logout();
+        navigate('/');
+      } else {
+        toast.error(error.response?.data?.message || "Failed to delete account.");
+      }
       setIsDeleting(false);
     }
   };
@@ -160,6 +175,7 @@ const ProfilePage = () => {
   const closeDeleteModals = () => {
     setDeleteStep(0);
     setDeleteInput('');
+    setDeletePassword('');
   };
 
   return (
@@ -419,12 +435,55 @@ const ProfilePage = () => {
                 Cancel
               </button>
               <button 
-                onClick={handleDeleteAccount}
+                onClick={() => setDeleteStep(3)}
                 disabled={deleteInput !== exactPhrase || isDeleting}
                 className="flex-[1.2] py-4 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:bg-[#333] disabled:text-gray-500 text-white font-bold tracking-wide uppercase rounded-xl transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] disabled:shadow-none outline-none flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-5 h-5" />
                 {isDeleting ? 'Obliterating...' : 'Confirm Wipe'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {deleteStep === 3 && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-[#1e2136] border border-red-500/20 p-8 rounded-[2rem] w-full max-w-xl flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.15)] relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-red-500" />
+            <h2 className="text-2xl font-extrabold text-white mb-3">Password Verification</h2>
+            <p className="text-gray-400 text-base mb-8 leading-relaxed">
+              Please enter your password to confirm account deletion. This is a security measure to protect your account.
+            </p>
+
+            <input 
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-5 py-4 bg-black/30 border-2 border-red-500/20 focus:border-red-500 rounded-xl text-white outline-none transition-all mb-8 font-medium placeholder-red-500/30"
+              autoComplete="off"
+            />
+
+            <div className="flex w-full gap-4">
+              <button 
+                onClick={closeDeleteModals}
+                className="flex-[0.8] py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl transition-colors outline-none"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteAccount}
+                disabled={!deletePassword || isDeleting}
+                className="flex-[1.2] py-4 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:bg-[#333] disabled:text-gray-500 text-white font-bold tracking-wide uppercase rounded-xl transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] disabled:shadow-none outline-none flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-5 h-5" />
+                {isDeleting ? 'Verifying...' : 'Confirm Delete'}
               </button>
             </div>
           </motion.div>
