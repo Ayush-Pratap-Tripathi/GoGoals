@@ -55,7 +55,7 @@ const GoalCreateModal = ({ isOpen, onClose, onAdd }) => {
         return (
           <input 
             type="number" 
-            placeholder="YYYY (e.g., 2026)"
+
             min="2020" max="2100"
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
@@ -120,7 +120,7 @@ const GoalCreateModal = ({ isOpen, onClose, onAdd }) => {
                     type="text" 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Finish React Project..."
+
                     className="w-full bg-[#292d44] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] transition-colors shadow-inner"
                     required
                   />

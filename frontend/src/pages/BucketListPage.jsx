@@ -93,7 +93,7 @@ const BucketListPage = () => {
 
   return (
     <div className="bg-[#1a1c2d] min-h-screen w-full flex flex-col font-sans text-white relative isolate">
-      
+
       {/* Background Micro-Gradients */}
       <div className="absolute top-0 left-1/4 w-[50vw] h-[50vw] bg-purple-600/10 rounded-full blur-[100px] -z-10 pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[40vw] h-[40vw] bg-indigo-600/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
@@ -104,10 +104,10 @@ const BucketListPage = () => {
       </div>
 
       <main className="flex-1 w-full max-w-5xl mx-auto py-12 px-6 flex flex-col relative z-10">
-        
+
         {/* Header */}
         <div className="flex flex-col mb-10 gap-4">
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2 text-gray-400 hover:text-[#3b82f6] transition-colors mb-6 outline-none group w-fit font-medium text-sm tracking-wide"
           >
@@ -122,7 +122,7 @@ const BucketListPage = () => {
         </div>
 
         {/* Add New Item Form */}
-        <motion.form 
+        <motion.form
           onSubmit={handleAddItem}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,14 +131,14 @@ const BucketListPage = () => {
         >
           <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest">Add New Dream</label>
           <div className="flex gap-3">
-            <input 
-              type="text" 
-              value={newItemTitle} 
+            <input
+              type="text"
+              value={newItemTitle}
               onChange={(e) => setNewItemTitle(e.target.value)}
-              placeholder="e.g., Travel to Japan, Learn guitar, Write a book..."
+
               className="flex-1 px-5 py-4 bg-black/30 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none font-medium text-lg"
             />
-            <button 
+            <button
               type="submit"
               disabled={isAdding || !newItemTitle.trim()}
               className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-400 hover:to-purple-600 active:scale-95 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] outline-none disabled:opacity-70 whitespace-nowrap"
@@ -150,7 +150,7 @@ const BucketListPage = () => {
         </motion.form>
 
         {/* Bucket List Items */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
@@ -185,11 +185,10 @@ const BucketListPage = () => {
                   )}
                 </button>
 
-                <span className={`flex-1 text-lg font-medium transition-all ${
-                  item.isCompleted 
-                    ? 'text-gray-500 line-through' 
-                    : 'text-white'
-                }`}>
+                <span className={`flex-1 text-lg font-medium transition-all ${item.isCompleted
+                  ? 'text-gray-500 line-through'
+                  : 'text-white'
+                  }`}>
                   {item.title}
                 </span>
 
@@ -206,7 +205,7 @@ const BucketListPage = () => {
 
         {/* Stats Summary */}
         {bucketItems.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
@@ -216,7 +215,7 @@ const BucketListPage = () => {
               You've completed <span className="font-bold text-green-400">{bucketItems.filter(i => i.isCompleted).length}</span> out of <span className="font-bold text-purple-400">{bucketItems.length}</span> dreams
             </p>
             <div className="mt-4 w-full bg-black/30 rounded-full h-2 overflow-hidden border border-white/10">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-green-400 to-purple-500 transition-all duration-500"
                 style={{ width: `${(bucketItems.filter(i => i.isCompleted).length / bucketItems.length) * 100}%` }}
               />

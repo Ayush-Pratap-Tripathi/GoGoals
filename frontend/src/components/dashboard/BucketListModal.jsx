@@ -194,7 +194,7 @@ const BucketListModal = ({ isOpen, onClose }) => {
                 type="text" 
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Add a new dream..."
+
                 className="flex-1 bg-[#2d3250] border border-white/10 rounded-xl px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa] transition-all shadow-inner"
               />
               <button 

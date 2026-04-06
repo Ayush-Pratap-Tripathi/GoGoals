@@ -114,7 +114,7 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
                 onChange={handleChange}
                 required 
                 className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/50 focus:ring-1 focus:ring-yellow-400/50 transition-all font-sans"
-                placeholder="you@example.com"
+
               />
             </div>
 
@@ -127,7 +127,7 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
                 onChange={handleChange}
                 required 
                 className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/50 focus:ring-1 focus:ring-yellow-400/50 transition-all font-sans"
-                placeholder="••••••••"
+
               />
             </div>
 

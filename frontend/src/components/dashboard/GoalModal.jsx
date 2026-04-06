@@ -99,7 +99,7 @@ const GoalModal = ({ isOpen, onClose, category, goals, onToggle, onDelete, onAdd
                 type="text" 
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder={`Add a new ${category} task...`}
+
                 className="flex-1 bg-[#2d3250] border border-white/10 rounded-xl px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] transition-all shadow-inner"
               />
               <button 

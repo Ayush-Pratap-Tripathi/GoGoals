@@ -11,6 +11,7 @@ import { Plus } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import { quotes } from '../data/quotes';
 
 const DashboardPage = () => {
   const { token } = useContext(AuthContext);
@@ -48,6 +49,27 @@ const DashboardPage = () => {
   const [monthOffset, setMonthOffset] = useState(0);
   const [yearOffset, setYearOffset] = useState(0);
   const [decadeOffset, setDecadeOffset] = useState(0);
+
+  // Motivational Quotes state
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [fadeQuote, setFadeQuote] = useState(true);
+
+  useEffect(() => {
+    // Pick a random starting quote when the component mounts
+    setQuoteIndex(Math.floor(Math.random() * quotes.length));
+  }, []);
+
+  useEffect(() => {
+    const quoteInterval = setInterval(() => {
+      setFadeQuote(false); // start fade out
+      setTimeout(() => {
+        setQuoteIndex(prev => (prev + 1) % quotes.length);
+        setFadeQuote(true); // start fade in after change
+      }, 500); // Wait for fade out to complete (500ms should match CSS transition duration)
+    }, 3000); // Total 3 seconds per quote
+
+    return () => clearInterval(quoteInterval);
+  }, []);
 
   const fetchDashboardData = async () => {
     if (!token) return;
@@ -209,10 +231,14 @@ const DashboardPage = () => {
         {/* FULL SCREEN MOTIVATIONAL TAIL */}
         {/* Forces exactly 1 standard viewport height to span out the final scrolling act */}
         <div className="w-full min-h-[calc(100vh-140px)] flex flex-col items-center justify-center text-center mt-10 px-6">
-          <p className="max-w-xl text-lg md:text-xl text-gray-300 italic font-medium leading-relaxed opacity-80 px-4">
-            "Anything motivational or inspiring quote here to motivate the user or inspire them to not to give up and keep moving."
-          </p>
-          <span className="text-sm text-gray-400 font-medium tracking-wide mt-6">- Author Source</span>
+          <div className={`transition-opacity duration-500 ease-in-out ${fadeQuote ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="max-w-xl text-lg md:text-xl text-gray-300 italic font-medium leading-relaxed opacity-80 px-4 whitespace-pre-wrap">
+              "{quotes[quoteIndex]?.quote}"
+            </p>
+            <span className="block text-sm text-gray-400 font-medium tracking-wide mt-6">
+              - {quotes[quoteIndex]?.author}
+            </span>
+          </div>
           
           <div className="flex flex-col items-center mt-20 opacity-70 group hover:opacity-100 transition-all duration-500">
             <img src={logo} alt="GoGoals Icon" className="w-24 h-auto object-contain mb-4 drop-shadow-2xl" />

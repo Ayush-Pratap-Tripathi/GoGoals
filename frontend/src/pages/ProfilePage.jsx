@@ -282,7 +282,7 @@ const ProfilePage = () => {
                     type="text" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your full name"
+
                     required
                     className="w-full px-5 py-4 bg-black/30 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none font-medium text-lg"
                   />
@@ -403,7 +403,7 @@ const ProfilePage = () => {
               type="text"
               value={deleteInput}
               onChange={(e) => setDeleteInput(e.target.value)}
-              placeholder="Input validation sequence..."
+
               className="w-full px-5 py-4 bg-black/30 border-2 border-red-500/20 focus:border-red-500 rounded-xl text-white outline-none transition-all mb-8 font-medium placeholder-red-500/30"
               autoComplete="off"
               autoCorrect="off"
