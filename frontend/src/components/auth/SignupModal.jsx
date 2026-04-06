@@ -42,8 +42,7 @@ const SignupModal = ({ isOpen, onClose, switchToLogin }) => {
       // Set global auth state and persist JWT
       login(userData, response.data.token);
 
-      toast.success('User registered successfully!', {
-        duration: 4000,
+      const toastId = toast.success('User registered successfully!', {
         style: {
           borderRadius: '10px',
           background: '#292d44',
@@ -54,12 +53,16 @@ const SignupModal = ({ isOpen, onClose, switchToLogin }) => {
       });
 
       onClose();
-      navigate('/dashboard');
+      
+      // Dismiss toast and navigate after a brief delay
+      setTimeout(() => {
+        toast.dismiss(toastId);
+        navigate('/dashboard');
+      }, 2000);
     } catch (error) {
       console.error("Auth Error:", error);
       const message = error.response?.data?.message || 'An error occurred. Please try again.';
       toast.error(message, {
-        duration: 4000,
         style: { borderRadius: '10px', background: '#ef4444', color: '#fff' },
       });
     } finally {
