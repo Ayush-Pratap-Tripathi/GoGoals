@@ -290,10 +290,6 @@ The `vercel.json` in frontend handles this. All routes redirect to `index.html`.
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the ISC License - see LICENSE file for details.
-
 ## 👨‍💻 Author
 
 **Ayush Pratap**
@@ -306,10 +302,6 @@ This project is licensed under the ISC License - see LICENSE file for details.
 - [Tailwind CSS](https://tailwindcss.com) - Styling
 - [Vite](https://vitejs.dev) - Build tool
 - [Framer Motion](https://www.framer.com/motion) - Animations
-
-## 📞 Support
-
-For support or questions, please open an issue on GitHub or contact the author.
 
 ---
 
