@@ -41,6 +41,7 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
       login(userData, response.data.token);
 
       toast.success('Logged in successfully!', {
+        duration: 4000,
         style: {
           borderRadius: '10px',
           background: '#292d44',
@@ -56,6 +57,7 @@ const LoginModal = ({ isOpen, onClose, switchToSignup }) => {
       console.error("Auth Error:", error);
       const message = error.response?.data?.message || 'An error occurred. Please try again.';
       toast.error(message, {
+        duration: 4000,
         style: { borderRadius: '10px', background: '#ef4444', color: '#fff' },
       });
     } finally {
