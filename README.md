@@ -239,7 +239,7 @@ pm2 start server.js --name "gogoals-api"
 3. Set environment variables in Vercel dashboard
 4. Deploy automatically on push
 
-### Backend (Railway/Render/Heroku)
+### Backend (Render)
 1. Create account on deployment platform
 2. Connect MongoDB Atlas database
 3. Set environment variables
