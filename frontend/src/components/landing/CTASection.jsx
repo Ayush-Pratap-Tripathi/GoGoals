@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const CTASection = ({ openAuthModal }) => {
   return (
-    <section id="cta" className="flex flex-col items-center justify-center text-center gap-10 py-32 mt-10">
+    <section id="cta" className="flex flex-col items-center justify-center text-center gap-10 py-10 lg:py-32 lg:mt-10">
       
       <motion.div
         className="space-y-6 flex flex-col items-center"
@@ -12,19 +12,19 @@ const CTASection = ({ openAuthModal }) => {
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight px-4 sm:px-0">
           Start your Journey now!
         </h2>
         
-        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
           Big results don't come from big efforts once. <br className="hidden md:block" />
           They come from small efforts repeated every day.
         </p>
 
-        <div className="pt-8">
+        <div className="pt-8 w-full px-6 sm:px-0 flex justify-center">
           <button 
             onClick={() => openAuthModal('signup')}
-            className="px-14 py-4 rounded-full border border-white/20 bg-white/10 text-white text-xl font-bold hover:bg-white hover:text-[#292d44] transition-all duration-300 shadow-xl hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] cursor-pointer"
+            className="w-full max-w-xs sm:w-auto sm:max-w-none px-8 py-3 sm:px-14 sm:py-4 rounded-full border border-white/20 bg-white/10 text-white text-lg sm:text-xl font-bold hover:bg-white hover:text-[#292d44] transition-all duration-300 shadow-xl hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] cursor-pointer"
           >
             Get Started
           </button>

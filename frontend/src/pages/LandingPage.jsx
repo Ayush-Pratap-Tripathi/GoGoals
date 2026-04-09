@@ -42,10 +42,16 @@ const LandingPage = () => {
 
       <Navbar openAuthModal={openAuthModal} />
       
-      <main className="pt-24 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col gap-24 font-sans">
-        <HeroSection />
-        <FeaturesSection />
-        <CTASection openAuthModal={openAuthModal} />
+      <main className="pt-24 max-w-7xl mx-auto flex flex-row overflow-x-auto overflow-y-hidden lg:flex-col lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-0 lg:gap-24 font-sans [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="w-full shrink-0 snap-center min-w-full px-4 sm:px-6 md:px-12 lg:px-24">
+          <HeroSection />
+        </div>
+        <div className="w-full shrink-0 snap-center min-w-full px-4 sm:px-6 md:px-12 lg:px-24">
+          <FeaturesSection />
+        </div>
+        <div className="w-full shrink-0 snap-center min-w-full px-4 sm:px-6 md:px-12 lg:px-24">
+          <CTASection openAuthModal={openAuthModal} />
+        </div>
       </main>
 
       <Footer />

@@ -55,7 +55,7 @@ const DashboardNavbar = () => {
           alt="GoGoals Logo" 
           className="w-10 h-auto object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md" 
         />
-        <span className="text-xl font-bold tracking-wide group-hover:text-yellow-400 transition-colors duration-300 drop-shadow-md text-white">
+        <span className="hidden sm:block text-xl font-bold tracking-wide group-hover:text-yellow-400 transition-colors duration-300 drop-shadow-md text-white">
           GoGoals
         </span>
       </Link>
