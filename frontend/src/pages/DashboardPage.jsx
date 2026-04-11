@@ -165,9 +165,17 @@ const DashboardPage = () => {
 
   const handleAddGoal = async (category, title, scheduledDate = null) => {
     try {
+      let finalScheduledDate = scheduledDate;
+      if (!finalScheduledDate) {
+        if (category === 'daily') finalScheduledDate = todayStr;
+        else if (category === 'weekly') finalScheduledDate = thisWeekStr;
+        else if (category === 'monthly') finalScheduledDate = thisMonthStr;
+        else if (category === 'yearly') finalScheduledDate = String(currentYear);
+      }
+
       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       await axios.post(`${apiBase}/goals`, 
-        { category, title, scheduledDate },
+        { category, title, scheduledDate: finalScheduledDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Task added successfully!", {
