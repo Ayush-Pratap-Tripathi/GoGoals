@@ -26,28 +26,13 @@ if (!fs.existsSync(uploadsDir)) {
 
 const app = express();
 
-// Allowed origins — add any extra domains here
-const ALLOWED_ORIGINS = [
-  'https://go-goals.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-];
-
-// CORS middleware
+// Middleware
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. curl, Postman, server-to-server)
-    if (!origin) return callback(null, true);
-    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error(`CORS: origin ${origin} not allowed`));
-  },
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
+  credentials: false
 }));
-
-// Explicitly handle OPTIONS preflight for all routes (required on Vercel)
-app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
