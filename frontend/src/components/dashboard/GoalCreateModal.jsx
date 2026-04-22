@@ -1,11 +1,28 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CalendarPlus, Target } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const GoalCreateModal = ({ isOpen, onClose, onAdd }) => {
+const GoalCreateModal = ({ isOpen, onClose, onAdd, initialData = null }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('daily');
-  const [scheduledDate, setScheduledDate] = useState(''); 
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [description, setDescription] = useState('');
+
+  // When modal opens with initialData, populate fields
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setTitle(initialData.title || '');
+      setCategory(initialData.category || 'daily');
+      setScheduledDate(initialData.scheduledDate || '');
+      setDescription(initialData.description || '');
+    } else if (isOpen) {
+      // Reset fields when opening empty modal
+      setTitle('');
+      setCategory('daily');
+      setScheduledDate('');
+      setDescription('');
+    }
+  }, [isOpen, initialData]); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +35,7 @@ const GoalCreateModal = ({ isOpen, onClose, onAdd }) => {
     setTitle('');
     setCategory('daily');
     setScheduledDate('');
+    setDescription('');
     onClose();
   };
 
@@ -126,6 +144,19 @@ const GoalCreateModal = ({ isOpen, onClose, onAdd }) => {
                   />
                 </div>
               </div>
+
+              {/* Optional Description Field */}
+              {description && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-gray-300 tracking-wide uppercase">Notes</label>
+                  <textarea 
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Add additional notes or context..."
+                    className="w-full bg-[#292d44] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] transition-colors shadow-inner resize-none h-20"
+                  />
+                </div>
+              )}
 
               {/* Dynamic Dropdown Select Hooks */}
               <div className="flex flex-col gap-2">

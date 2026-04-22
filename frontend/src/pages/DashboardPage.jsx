@@ -1,5 +1,6 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar';
 import DashboardFooter from '../components/dashboard/DashboardFooter';
+import SpeechRecordingButton from '../components/dashboard/SpeechRecordingButton';
 import logo from '../assets/logo.png';
 import StatCard from '../components/dashboard/StatCard';
 import ChartBlock from '../components/dashboard/ChartBlock';
@@ -60,6 +61,7 @@ const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('daily');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [speechGoalData, setSpeechGoalData] = useState(null);
   const [activeChartModal, setActiveChartModal] = useState(null);
 
   // Time Travel Gesture State Limit trackers
@@ -368,10 +370,18 @@ const DashboardPage = () => {
         <DashboardFooter />
       </div>
 
+      {/* SPEECH RECORDING BUTTON */}
+      <SpeechRecordingButton 
+        onSpeechDataReceived={(goalData) => {
+          setSpeechGoalData(goalData);
+          setIsCreateModalOpen(true);
+        }}
+      />
+
       {/* FLOATING ACTION BUTTON */}
       <button 
         onClick={() => setIsCreateModalOpen(true)}
-        className="absolute bottom-20 md:bottom-24 right-6 md:right-10 w-14 h-14 bg-[#3b82f6] hover:bg-[#2563eb] hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white"
+        className="absolute bottom-20 md:bottom-24 left-6 md:left-10 w-14 h-14 bg-[#3b82f6] hover:bg-[#2563eb] hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white"
         title="Create New Goal"
       >
         <Plus className="w-7 h-7" />
@@ -380,8 +390,12 @@ const DashboardPage = () => {
       {/* DYNAMIC GOAL CREATION UI OVERLAY */}
       <GoalCreateModal 
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setSpeechGoalData(null);
+        }}
         onAdd={handleAddGoal}
+        initialData={speechGoalData}
       />
 
       {/* DYNAMIC GOAL MANAGEMENT UI OVERLAY */}
