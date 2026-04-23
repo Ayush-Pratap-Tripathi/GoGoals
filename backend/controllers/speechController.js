@@ -1,12 +1,17 @@
 import OpenAI from 'openai';
+import Audio from '../models/Audio.js';
 import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 /**
  * Complete pipeline: Audio → Whisper → GPT-4o mini extraction → Structured Goal Data
+ * Audio is stored in MongoDB instead of file system for serverless compatibility
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
 export const transcribeAndExtractGoal = async (req, res) => {
+  let audioRecord = null;
   try {
     // Check if file was uploaded
     if (!req.file) {
@@ -22,7 +27,7 @@ export const transcribeAndExtractGoal = async (req, res) => {
       });
     }
 
-    const audioFilePath = req.file.path;
+    const audioBuffer = req.file.buffer;
     const language = req.body.language || 'en';
 
     // Validate file format
@@ -37,17 +42,32 @@ export const transcribeAndExtractGoal = async (req, res) => {
       'audio/flac',
     ];
     if (!allowedMimes.includes(req.file.mimetype)) {
-      fs.unlinkSync(audioFilePath);
       return res.status(400).json({
         error: `Invalid audio format. Supported formats: MP3, WAV, M4A, WebM, FLAC, Ogg. Received: ${req.file.mimetype}`,
       });
     }
 
+    // Step 0: Save audio to MongoDB for serverless compatibility
+    console.log('💾 Step 0: Saving audio to MongoDB...');
+    audioRecord = new Audio({
+      user: req.user.id,
+      audioData: audioBuffer,
+      mimeType: req.file.mimetype,
+      originalFileName: req.file.originalname,
+      fileSize: req.file.size,
+      language: language,
+      processingStatus: 'processing',
+    });
+    await audioRecord.save();
+    console.log(`✅ Audio saved to MongoDB with ID: ${audioRecord._id}`);
+
     console.log('🎤 Step 1: Transcribing audio with Whisper...');
     // Step 1: Transcribe audio with Whisper
-    const transcript = await transcribeWithWhisper(audioFilePath, apiKey, language);
+    const transcript = await transcribeWithWhisper(audioBuffer, apiKey, language, req.file.originalname, req.file.mimetype);
     if (transcript.error) {
-      fs.unlinkSync(audioFilePath);
+      audioRecord.processingStatus = 'failed';
+      audioRecord.processingError = transcript.details;
+      await audioRecord.save();
       return res.status(500).json(transcript);
     }
 
@@ -55,27 +75,34 @@ export const transcribeAndExtractGoal = async (req, res) => {
     console.log('🤖 Step 2: Extracting goal data with GPT-4o mini...');
     // Step 2: Extract structured goal data using GPT-4o mini
     const goalData = await extractGoalDataWithGPT(transcript.text, apiKey);
-    
-    // Clean up uploaded file
-    if (fs.existsSync(audioFilePath)) {
-      fs.unlinkSync(audioFilePath);
-    }
 
     if (goalData.error) {
+      audioRecord.processingStatus = 'failed';
+      audioRecord.processingError = goalData.details || goalData.error;
+      await audioRecord.save();
       return res.status(500).json(goalData);
     }
+
+    // Update audio record with processing results
+    audioRecord.transcript = transcript.text;
+    audioRecord.extractedGoalData = goalData;
+    audioRecord.processingStatus = 'completed';
+    await audioRecord.save();
 
     console.log('✅ Extracted Goal Data:', goalData);
     return res.status(200).json({
       success: true,
+      audioId: audioRecord._id,
       transcript: transcript.text,
       goalData: goalData,
       model: 'whisper-1 + gpt-4o-mini',
     });
   } catch (error) {
-    // Clean up if file exists
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    // Mark processing as failed in MongoDB if record exists
+    if (audioRecord) {
+      audioRecord.processingStatus = 'failed';
+      audioRecord.processingError = error.message;
+      await audioRecord.save().catch(err => console.error('Error updating audio record:', err));
     }
 
     console.error('Pipeline error:', error);
@@ -88,18 +115,28 @@ export const transcribeAndExtractGoal = async (req, res) => {
 
 /**
  * Transcribe audio using OpenAI's Whisper API
- * @param {string} audioFilePath - Path to audio file
+ * @param {Buffer} audioBuffer - Audio file buffer from multer (in-memory)
  * @param {string} apiKey - OpenAI API key
  * @param {string} language - Language code
+ * @param {string} originalname - Original filename with extension
+ * @param {string} mimeType - MIME type of the audio
  * @returns {Promise<Object>} Transcription result
  */
-const transcribeWithWhisper = async (audioFilePath, apiKey, language) => {
+const transcribeWithWhisper = async (audioBuffer, apiKey, language, originalname, mimeType) => {
+  // Extract extension from original filename or determine from MIME type
+  let extension = path.extname(originalname) || getMimeExtension(mimeType);
+  const tempFile = path.join(os.tmpdir(), `audio-${Date.now()}${extension}`);
+  
   try {
+    // Write buffer to temporary file for OpenAI SDK (serverless-safe)
+    fs.writeFileSync(tempFile, audioBuffer);
+    console.log(`📝 Temp audio file created: ${tempFile}`);
+
     const openai = new OpenAI({
       apiKey: apiKey,
     });
 
-    const audioStream = fs.createReadStream(audioFilePath);
+    const audioStream = fs.createReadStream(tempFile);
 
     const response = await openai.audio.transcriptions.create({
       file: audioStream,
@@ -118,7 +155,36 @@ const transcribeWithWhisper = async (audioFilePath, apiKey, language) => {
       error: 'Transcription failed',
       details: error.message,
     };
+  } finally {
+    // Clean up temporary file
+    try {
+      if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile);
+        console.log(`🗑️ Temp file cleaned up: ${tempFile}`);
+      }
+    } catch (cleanupError) {
+      console.warn('Error cleaning up temp file:', cleanupError);
+    }
   }
+};
+
+/**
+ * Get file extension from MIME type
+ * @param {string} mimeType - MIME type (e.g., 'audio/webm')
+ * @returns {string} File extension with dot (e.g., '.webm')
+ */
+const getMimeExtension = (mimeType) => {
+  const mimeToExtension = {
+    'audio/wav': '.wav',
+    'audio/x-wav': '.wav',
+    'audio/mpeg': '.mp3',
+    'audio/mp4': '.m4a',
+    'audio/x-m4a': '.m4a',
+    'audio/webm': '.webm',
+    'audio/ogg': '.ogg',
+    'audio/flac': '.flac',
+  };
+  return mimeToExtension[mimeType] || '.webm';
 };
 
 /**

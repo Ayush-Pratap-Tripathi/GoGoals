@@ -1,21 +1,12 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
 import { transcribeAndExtractGoal } from '../controllers/speechController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Configure multer for audio file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/audio');
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
+// Configure multer for in-memory audio file uploads (serverless-compatible)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
