@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import Navbar from '../components/landing/Navbar';
 import HeroSection from '../components/landing/HeroSection';
 import FeaturesSection from '../components/landing/FeaturesSection';
@@ -24,8 +23,7 @@ const LandingPage = () => {
 
   return (
     <div className="relative pb-24">
-      {/* Global Toast Container */}
-      <Toaster position="top-center" reverseOrder={false} />
+
       
       {/* Separate Decoupled Modals */}
       <LoginModal 
