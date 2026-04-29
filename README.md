@@ -1,36 +1,42 @@
 # GoGoals 🎯
 
-A full-stack web application for goal tracking and management with user authentication, profile customization, and real-time analytics.
+A full-stack goal tracking and achievement platform with AI-powered voice input, premium subscriptions via Razorpay, real-time analytics, and a beautiful responsive UI.
+
+### 🔗 [Live Demo → go-goals.vercel.app](https://go-goals.vercel.app/)
 
 ## 🌟 Features
 
-- **User Authentication**: Secure signup/login with JWT tokens and bcrypt password hashing
-- **Goal Management**: Create, update, delete, and track personal goals
-- **🎤 Speech-to-Goal AI**: Convert voice input to structured goals using OpenAI Whisper & GPT-4o-mini
-- **Progress Analytics**: Visual dashboards with charts and statistics
-- **Bucket List**: Organize and manage life goals in a bucket list format
-- **User Profiles**: Customize profile with name and profile picture (with image cropping)
-- **Secure Account Deletion**: Multi-step account deletion with password verification
-- **Responsive Design**: Beautiful UI optimized for desktop and mobile
-- **Real-time Updates**: Instant synchronization of data across the app
-- **Serverless Ready**: MongoDB-based audio storage (no persistent file system needed)
+- **User Authentication** — Secure signup/login with JWT tokens and bcrypt password hashing
+- **Goal Management** — Create, update, delete, and track daily, weekly, monthly, and yearly goals
+- **🎤 Speech-to-Goal AI** — Convert voice input to structured goals using OpenAI Whisper & GPT-4o-mini
+- **📊 Progress Analytics** — Interactive charts (weekly, monthly, yearly, decade) with time-travel navigation
+- **🪣 Bucket List** — Organize and manage life goals in a dedicated bucket list
+- **👤 User Profiles** — Customize name and profile picture with image cropping
+- **💎 Premium Plans** — Upgrade via Razorpay payment gateway with 4 plan tiers
+- **🔐 Secure Account Deletion** — Multi-step deletion with password verification
+- **📱 Responsive Design** — Mobile-first UI with horizontal swipe navigation and desktop chart views
+- **💬 Motivational Quotes** — Cycling motivational quotes with smooth fade transitions
+- **☁️ Serverless Ready** — MongoDB-based storage (including audio), no persistent file system needed
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React** 18+ with Vite
-- **Tailwind CSS** for styling
-- **React Router** for navigation
+- **React 19** with Vite 8
+- **Tailwind CSS 4** for styling
+- **React Router 7** for navigation
 - **Axios** for API requests
 - **React Hot Toast** for notifications
 - **Framer Motion** for animations
+- **Recharts** for analytics charts
 - **Lucide React** for icons
 - **React Easy Crop** for image cropping
+- **Razorpay Checkout SDK** for payment UI
 - **Web Audio API** for microphone access
 
 ### Backend
 - **Node.js** with Express 5
 - **MongoDB** with Mongoose ODM
+- **Razorpay Node SDK** for order creation and payment verification
 - **OpenAI API** (Whisper for transcription + GPT-4o-mini for extraction)
 - **JWT** for authentication
 - **Bcrypt** for password hashing
@@ -39,9 +45,9 @@ A full-stack web application for goal tracking and management with user authenti
 - **Dotenv** for environment variables
 
 ### Storage & Deployment
-- **MongoDB** for all data (including audio files as binary)
+- **MongoDB Atlas** for all data (users, goals, audio files as binary)
+- **Vercel** for frontend hosting
 - **Serverless-ready** (no persistent file system needed)
-- Compatible with Vercel, Render, AWS Lambda, etc.
 
 ## 📁 Project Structure
 
@@ -49,38 +55,47 @@ A full-stack web application for goal tracking and management with user authenti
 GoGoals/
 ├── backend/
 │   ├── config/
-│   │   └── db.js                 # MongoDB connection
+│   │   └── db.js                  # MongoDB connection
 │   ├── controllers/
-│   │   ├── authController.js     # Auth logic
-│   │   ├── goalController.js     # Goal operations
-│   │   └── speechController.js   # Speech-to-Goal AI pipeline
+│   │   ├── authController.js      # Auth logic (register, login, profile)
+│   │   ├── goalController.js      # Goal CRUD operations
+│   │   ├── paymentController.js   # Razorpay order creation & verification
+│   │   └── speechController.js    # Speech-to-Goal AI pipeline
 │   ├── middleware/
-│   │   └── authMiddleware.js     # JWT protection
+│   │   └── authMiddleware.js      # JWT protection
 │   ├── models/
-│   │   ├── User.js               # User schema
-│   │   ├── Goal.js               # Goal schema
-│   │   └── Audio.js              # Audio storage in MongoDB
+│   │   ├── User.js                # User schema (with premium fields)
+│   │   ├── Goal.js                # Goal schema
+│   │   └── Audio.js               # Audio storage in MongoDB
 │   ├── routes/
-│   │   ├── authRoutes.js         # Auth endpoints
-│   │   ├── goalRoutes.js         # Goal endpoints
-│   │   └── speechRoutes.js       # Speech processing endpoint
-│   ├── server.js                 # Express app
-│   ├── seedDummyData.js          # Sample data
-│   ├── SPEECH_SETUP.md           # Speech feature setup guide
+│   │   ├── authRoutes.js          # Auth endpoints
+│   │   ├── goalRoutes.js          # Goal endpoints
+│   │   ├── paymentRoutes.js       # Payment endpoints
+│   │   └── speechRoutes.js        # Speech processing endpoint
+│   ├── server.js                  # Express app entry point
+│   ├── seedDummyData.js           # Sample data seeder
 │   ├── package.json
-│   └── .env                      # Environment variables
+│   └── .env                       # Environment variables
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── auth/             # Login/Signup modals
-│   │   │   ├── dashboard/        # Dashboard components
-│   │   │   │   ├── SpeechRecordingButton.jsx
-│   │   │   │   └── ...
-│   │   │   ├── landing/          # Landing page
-│   │   │   └── routing/          # Route protection
+│   │   │   ├── auth/              # Login/Signup modals
+│   │   │   ├── dashboard/         # Dashboard components
+│   │   │   │   ├── DashboardNavbar.jsx
+│   │   │   │   ├── DashboardFooter.jsx
+│   │   │   │   ├── StatCard.jsx
+│   │   │   │   ├── ChartBlock.jsx
+│   │   │   │   ├── GoalModal.jsx
+│   │   │   │   ├── GoalCreateModal.jsx
+│   │   │   │   ├── GoalListSection.jsx
+│   │   │   │   ├── BucketListModal.jsx
+│   │   │   │   ├── PremiumUpgradeModal.jsx
+│   │   │   │   └── SpeechRecordingButton.jsx
+│   │   │   ├── landing/           # Landing page components
+│   │   │   └── routing/           # Route protection
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx   # Global auth state
+│   │   │   └── AuthContext.jsx    # Global auth state
 │   │   ├── pages/
 │   │   │   ├── DashboardPage.jsx
 │   │   │   ├── LandingPage.jsx
@@ -91,13 +106,14 @@ GoGoals/
 │   │   │   ├── chartHelpers.js
 │   │   │   └── cropImage.js
 │   │   ├── data/
-│   │   │   └── quotes.js
+│   │   │   └── quotes.js         # Motivational quotes
 │   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── vercel.json               # Vercel routing config
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── vercel.json                # Vercel routing config
 │   ├── vite.config.js
 │   ├── package.json
-│   ├── .env                      # Environment variables
+│   ├── .env                       # Frontend env variables
 │   └── index.html
 │
 └── README.md
@@ -108,13 +124,14 @@ GoGoals/
 ### Prerequisites
 - Node.js 18+ and npm
 - MongoDB (local or Atlas)
-- Git
+- Razorpay account (for payment integration)
+- OpenAI API key (for Speech-to-Goal feature)
 
 ### Installation
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/GoGoals.git
+git clone https://github.com/Ayush-Pratap-Tripathi/GoGoals.git
 cd GoGoals
 ```
 
@@ -137,15 +154,18 @@ Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/gogoals
+MONGO_URI=mongodb://localhost:27017/gogoals
 # OR for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/gogoals
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/gogoals
 
 JWT_SECRET=your_super_secret_jwt_key_here
-NODE_ENV=development
 
 # OpenAI API Key (for Speech-to-Goal feature)
 OPENAI_API_KEY=sk-proj-your_openai_api_key_here
+
+# Razorpay API Keys (for premium payments)
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
 ```
 
 ### Frontend (.env)
@@ -160,7 +180,7 @@ For production:
 VITE_API_BASE_URL=https://your-backend-url.com/api
 ```
 
-**Note**: Get your OpenAI API key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+> **Note**: Get your OpenAI API key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys) and Razorpay keys from [dashboard.razorpay.com](https://dashboard.razorpay.com/app/keys)
 
 ## 🎮 Running the Project
 
@@ -192,48 +212,80 @@ cd backend
 npm start
 ```
 
-Or use PM2 for process management:
-```bash
-npm install -g pm2
-pm2 start server.js --name "gogoals-api"
-```
-
 ## 📡 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-- `PUT /api/auth/profile/name` - Update user name
-- `PUT /api/auth/profile/avatar` - Update profile picture
-- `DELETE /api/auth/profile` - Delete account (requires password)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register` | Register new user |
+| `POST` | `/api/auth/login` | Login user |
+| `GET` | `/api/auth/me` | Get current user |
+| `PUT` | `/api/auth/profile/name` | Update user name |
+| `PUT` | `/api/auth/profile/avatar` | Update profile picture |
+| `DELETE` | `/api/auth/profile` | Delete account (requires password) |
 
 ### Goals
-- `GET /api/goals` - Get all goals for current user
-- `POST /api/goals` - Create new goal
-- `PUT /api/goals/:id` - Update goal
-- `DELETE /api/goals/:id` - Delete goal
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/goals` | Get all goals for current user |
+| `POST` | `/api/goals` | Create new goal |
+| `PUT` | `/api/goals/:id` | Update goal |
+| `DELETE` | `/api/goals/:id` | Delete goal |
+
+### Payment (Razorpay) 💎
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/payment/create-order` | Create Razorpay order for a plan |
+| `POST` | `/api/payment/verify` | Verify payment signature & activate premium |
 
 ### Speech-to-Goal AI 🎤
-- `POST /api/speech/transcribe-and-extract` - Convert audio to goal
-  - **Request**: FormData with `audio` (file) and optional `language` (default: 'en')
-  - **Response**: 
-    ```json
-    {
-      "success": true,
-      "audioId": "mongodb_id",
-      "transcript": "Full transcribed text",
-      "goalData": {
-        "title": "Goal title",
-        "category": "daily|weekly|monthly|yearly|bucket",
-        "description": "Optional description",
-        "scheduledDate": "YYYY-MM-DD or category-specific format"
-      },
-      "model": "whisper-1 + gpt-4o-mini"
-    }
-    ```
-  - **Authentication**: Required (Bearer token)
-  - **Audio Formats**: WAV, MP3, M4A, WebM, FLAC, Ogg (max 25MB)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/speech/transcribe-and-extract` | Convert audio to structured goal |
+
+**Speech Response Example:**
+```json
+{
+  "success": true,
+  "audioId": "mongodb_id",
+  "transcript": "Full transcribed text",
+  "goalData": {
+    "title": "Goal title",
+    "category": "daily|weekly|monthly|yearly|bucket",
+    "description": "Optional description",
+    "scheduledDate": "YYYY-MM-DD or category-specific format"
+  },
+  "model": "whisper-1 + gpt-4o-mini"
+}
+```
+
+> All protected endpoints require `Authorization: Bearer <token>` header.
+
+## 💎 Premium Plans
+
+GoGoals offers a freemium model where premium users unlock advanced features:
+
+| Plan | Price | Savings |
+|------|-------|---------|
+| 1 Month | ₹500 | — |
+| 3 Months | ₹1,400 | Save 6.7% |
+| 6 Months | ₹2,500 | Save 16.7% |
+| 1 Year | ₹4,800 | Save 20% |
+
+### Premium Features
+- 🎤 **Voice-to-Goal AI** — Create goals using voice commands
+- 📊 **Advanced Analytics** — Monthly, yearly, and overall analytics charts
+- 🎯 **Unlimited Goals** — No restrictions on goal creation
+- 🛡️ **Priority Support** — Faster issue resolution
+
+### Payment Flow
+1. User selects a plan in the Premium modal
+2. Backend creates a Razorpay order via the Orders API
+3. Razorpay Checkout popup opens with prefilled user details
+4. User completes payment (card, UPI, netbanking, wallet)
+5. Backend verifies HMAC SHA256 signature
+6. User's `isPremium` flag is set to `true` with calculated `premiumExpiryDate`
+7. Auth context updates immediately — premium features unlock instantly
 
 ## 🔐 Security Features
 
@@ -242,7 +294,8 @@ pm2 start server.js --name "gogoals-api"
 - Protected routes with middleware validation
 - Password verification for account deletion
 - CORS enabled for cross-origin requests
-- Authorization headers required for protected endpoints
+- Razorpay HMAC SHA256 signature verification for payment integrity
+- Server-side order creation (no client-side amount tampering)
 
 ## 📱 Features Breakdown
 
@@ -256,37 +309,33 @@ pm2 start server.js --name "gogoals-api"
 - **Press-and-hold mic button** to record voice
 - **Automatic transcription** using OpenAI Whisper API
 - **Intelligent goal extraction** using GPT-4o-mini
-- **Auto-fills goal form** with:
-  - Title (cleaned of meta-actions)
-  - Category detection (daily/weekly/monthly/yearly/bucket)
-  - Scheduled date (category-specific format)
-  - Optional description
-- **Offline support**: Records locally, processes on server
+- **Auto-fills goal form** with title, category, scheduled date, and description
 - **Multiple formats**: Supports WebM, MP3, WAV, M4A, FLAC, Ogg
-- **MongoDB storage**: All audio stored securely in MongoDB
+- **MongoDB storage**: All audio stored securely in MongoDB (serverless-compatible)
+- **Premium-only**: Non-premium users see a shake animation + upgrade prompt
 
 ### Goal Management
 - Create goals via text input or voice
-- Update goal progress and status
+- Categories: daily, weekly, monthly, yearly, bucket
+- Toggle completion status
 - Delete goals with confirmation
-- Filter and sort goals
-- Real-time goal statistics
-- Automatic date format validation and correction
+- Real-time goal statistics and scoring (0–10 scale)
+- Automatic date format validation per category
+
+### Dashboard
+- Stat cards for daily, weekly, monthly, and yearly progress
+- Interactive charts with time-travel navigation (previous/next period)
+- Trackpad swipe support for chart navigation
+- Mobile: horizontal swipe between stats and charts screens
+- Desktop: vertical scroll with floating navigation controls
+- Cycling motivational quotes with smooth fade transitions
+- Premium-locked content shown as blurred with lock overlay + shake animation
 
 ### User Profile
 - Edit full name
 - Upload and crop profile picture (2MB limit)
 - View account settings
-- Multi-step account deletion process
-- Secure password verification for deletion
-
-### Dashboard
-- Visual goal statistics
-- Charts and analytics
-- Quick goal overview
-- Motivational quotes
-- Goal completion tracking
-- Speech recording button on dashboard
+- Multi-step account deletion with password verification
 
 ## 🚢 Deployment
 
@@ -303,35 +352,31 @@ This project is **serverless-ready** because:
 3. Set `VITE_API_BASE_URL` environment variable
 4. Deploy automatically on push
 
-### Backend (Vercel, Render, Railway, or other serverless platforms)
+### Backend (Vercel, Render, Railway, or other platforms)
 1. Create account on your chosen platform
-2. Connect MongoDB Atlas database (required)
+2. Connect MongoDB Atlas database
 3. Set environment variables:
-   - `MONGODB_URI` - MongoDB Atlas connection string
-   - `JWT_SECRET` - Secret key for JWT
-   - `OPENAI_API_KEY` - OpenAI API key for speech processing
+   - `MONGO_URI` — MongoDB Atlas connection string
+   - `JWT_SECRET` — Secret key for JWT
+   - `OPENAI_API_KEY` — OpenAI API key for speech processing
+   - `RAZORPAY_KEY_ID` — Razorpay API Key ID
+   - `RAZORPAY_KEY_SECRET` — Razorpay API Key Secret
 4. Deploy from GitHub
 5. Update frontend `VITE_API_BASE_URL` to point to deployed backend
 
-### Recommended Serverless Platforms
-- **Frontend**: Vercel (optimized for Next.js/React)
-- **Backend**: Vercel, Render, Railway, or Heroku (Node.js compatible)
-- **Database**: MongoDB Atlas (cloud MongoDB)
-
 ### Key Configuration Files
-- `frontend/vercel.json` - Vercel routing configuration (SPA fallback)
-- `backend/server.js` - CORS configured for all origins (production-safe)
+- `frontend/vercel.json` — Vercel routing configuration (SPA fallback)
+- `backend/server.js` — CORS configured for all origins
 
 ## 🐛 Troubleshooting
 
 ### CORS Errors
-If you see CORS errors, ensure:
-- Backend CORS is properly configured
-- Frontend API URL matches backend address
-- Authorization headers are included
+- Ensure backend CORS is properly configured
+- Frontend API URL must match backend address
+- Authorization headers must be included
 
 ### 404 on Page Refresh
-The `vercel.json` in frontend handles this. All routes redirect to `index.html`.
+The `vercel.json` in frontend handles this — all routes redirect to `index.html`.
 
 ### MongoDB Connection Issues
 - Verify connection string in `.env`
@@ -341,42 +386,31 @@ The `vercel.json` in frontend handles this. All routes redirect to `index.html`.
 ### Image Upload Issues
 - Maximum file size is 2MB
 - Only image formats (JPG, PNG) are accepted
-- Check browser's local storage has space
 
 ### Speech-to-Goal Issues
+- **Microphone not working**: Check browser permissions, try a different browser, ensure HTTPS in production
+- **Audio decode error**: Ensure browser supports WebM, try Chrome/Firefox/Edge
+- **Missing API key**: Add `OPENAI_API_KEY` to backend `.env`
+- **Goal not extracted**: Check OpenAI API quota and key validity
 
-**Microphone not working**
-- Check browser permissions (allow microphone access)
-- Try a different browser
-- Ensure HTTPS on production (required for Web Audio API)
-- Check system microphone is not in use by other apps
-
-**"Audio file could not be decoded" error**
-- Ensure browser supports WebM audio format
-- Try a different browser (Chrome/Firefox/Edge recommended)
-- Check your internet connection (OpenAI API must be reachable)
-
-**Missing OpenAI API key**
-- Generate key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-- Add `OPENAI_API_KEY` to backend `.env`
-- Ensure key has sufficient quota/credits
-
-**Goal data not being extracted**
-- Check OpenAI API quota
-- Verify `OPENAI_API_KEY` is valid
-- Check backend logs for error details
-- Ensure clear speech (Whisper works best with clear audio)
+### Payment Issues
+- **Razorpay popup not opening**: Ensure the checkout script is loaded in `index.html`
+- **Order creation failing**: Check `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in backend `.env`
+- **Signature verification failing**: Ensure the key secret matches between order creation and verification
+- **Premium not activating**: Check backend logs for verification errors
 
 ## 📈 Performance Tips
 
 1. **Frontend**
-   - Images are cropped automatically (reduces file size)
+   - Images are cropped client-side (reduces upload size)
    - Lazy loading for components
    - Optimized bundle with Vite
+   - Chart data computed from in-memory goal array (no extra API calls)
 
 2. **Backend**
-   - Database indexes created for common queries
-   - JWT caching prevents repeated validation
+   - Database indexes for common queries
+   - JWT verification prevents repeated DB lookups
+   - Razorpay instance lazy-initialized (avoids module-load issues)
    - Request body limited to 10MB
 
 ## 🤝 Contributing
@@ -389,29 +423,32 @@ The `vercel.json` in frontend handles this. All routes redirect to `index.html`.
 
 ## 👨‍💻 Author
 
-**Ayush Pratap**
+**Ayush Pratap Tripathi**
 
 ## 🙏 Acknowledgments
 
-- [React](https://react.dev) - UI library
-- [Express](https://expressjs.com) - Backend framework
-- [MongoDB](https://www.mongodb.com) - Database
-- [OpenAI](https://openai.com) - AI APIs (Whisper, GPT-4o-mini)
-- [Tailwind CSS](https://tailwindcss.com) - Styling
-- [Vite](https://vitejs.dev) - Build tool
-- [Framer Motion](https://www.framer.com/motion) - Animations
-- [Multer](https://github.com/expressjs/multer) - File upload handling
-- [Mongoose](https://mongoosejs.com) - MongoDB ODM
+- [React](https://react.dev) — UI library
+- [Express](https://expressjs.com) — Backend framework
+- [MongoDB](https://www.mongodb.com) — Database
+- [Razorpay](https://razorpay.com) — Payment gateway
+- [OpenAI](https://openai.com) — AI APIs (Whisper, GPT-4o-mini)
+- [Tailwind CSS](https://tailwindcss.com) — Styling
+- [Vite](https://vitejs.dev) — Build tool
+- [Framer Motion](https://www.framer.com/motion) — Animations
+- [Recharts](https://recharts.org) — Charting library
+- [Mongoose](https://mongoosejs.com) — MongoDB ODM
 
 ---
 
-**Last Updated**: April 23, 2026  
-**Version**: 2.0.0 (with Speech-to-Goal AI)
+**Last Updated**: April 30, 2026
+**Version**: 3.0.0 (with Razorpay Premium Payments)
 
 ## 📚 Additional Resources
 
+- **Live Demo**: [go-goals.vercel.app](https://go-goals.vercel.app/)
 - **Speech Setup Guide**: See [SPEECH_SETUP.md](backend/SPEECH_SETUP.md) for detailed speech-to-goal configuration
 - **Speech Pipeline**: See [SPEECH_TO_GOAL_PIPELINE.md](backend/SPEECH_TO_GOAL_PIPELINE.md) for technical details
-- **OpenAI Docs**: [api.openai.com/docs](https://platform.openai.com/docs)
+- **Razorpay Docs**: [razorpay.com/docs](https://razorpay.com/docs/)
+- **OpenAI Docs**: [platform.openai.com/docs](https://platform.openai.com/docs)
 - **MongoDB Docs**: [docs.mongodb.com](https://docs.mongodb.com)
 - **React Docs**: [react.dev](https://react.dev)

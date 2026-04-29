@@ -1,11 +1,13 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
-const ChartBlock = ({ title, data, onPrevious, onNext }) => {
+const ChartBlock = ({ title, data, onPrevious, onNext, isPremium = true }) => {
   const swipeLockRef = useRef(false);
   const [direction, setDirection] = useState(1); // 1 for Next, -1 for Prev
+  const [isShaking, setIsShaking] = useState(false);
 
   const handleNext = () => {
     setDirection(1);
@@ -69,7 +71,7 @@ const ChartBlock = ({ title, data, onPrevious, onNext }) => {
 
       {/* Chart Canvas utilizing Recharts and Native OS Trackpad Events strictly bound to Y:10 */}
       <div 
-        className="h-64 md:h-[400px] w-full touch-pan-x cursor-grab active:cursor-grabbing relative" 
+        className={`h-64 md:h-[400px] w-full touch-pan-x cursor-grab active:cursor-grabbing relative ${isShaking ? 'animate-premium-shake' : ''}`}
         onWheel={handleWheel}
       >
         {/* STATIC Y-AXIS UNDERLAY (Never Animates, strictly fixed natively) */}
@@ -101,7 +103,7 @@ const ChartBlock = ({ title, data, onPrevious, onNext }) => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction === 1 ? -50 : 50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute inset-0 w-full h-full z-10"
+            className={`absolute inset-0 w-full h-full z-10 ${!isPremium ? 'blur-sm' : ''}`}
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
@@ -128,6 +130,24 @@ const ChartBlock = ({ title, data, onPrevious, onNext }) => {
             </ResponsiveContainer>
           </motion.div>
         </AnimatePresence>
+
+        {/* Premium Lock Overlay */}
+        {!isPremium && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm z-20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-black/40 transition-colors"
+            onClick={() => {
+              setIsShaking(true);
+              setTimeout(() => setIsShaking(false), 600);
+              toast.error('Upgrade to premium to use this feature', {
+                style: { borderRadius: '10px', background: '#292d44', color: '#fff' }
+              });
+            }}
+          >
+            <Lock className="w-8 h-8 text-white" />
+          </motion.div>
+        )}
       </div>
 
     </motion.div>

@@ -49,8 +49,15 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Update user in context (for when premium status changes, etc.)
+  const updateUser = (updatedData) => {
+    const newUser = { ...user, ...updatedData };
+    setUser(newUser);
+    localStorage.setItem('userData', JSON.stringify(newUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout, updateUser, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

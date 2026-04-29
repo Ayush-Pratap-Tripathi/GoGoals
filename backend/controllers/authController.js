@@ -40,6 +40,8 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePicture: user.profilePicture,
+        isPremium: user.isPremium,
+        premiumExpiryDate: user.premiumExpiryDate,
         token: generateToken(user._id),
       });
     } else {
@@ -65,6 +67,8 @@ export const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePicture: user.profilePicture,
+        isPremium: user.isPremium,
+        premiumExpiryDate: user.premiumExpiryDate,
         token: generateToken(user._id),
       });
     } else {
@@ -105,6 +109,8 @@ export const updateName = async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         profilePicture: updatedUser.profilePicture,
+        isPremium: updatedUser.isPremium,
+        premiumExpiryDate: updatedUser.premiumExpiryDate,
         token: generateToken(updatedUser._id),
       });
     } else {
@@ -139,8 +145,8 @@ export const updateProfilePicture = async (req, res) => {
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
-        profilePicture: updatedUser.profilePicture,
-        token: generateToken(updatedUser._id),
+        profilePicture: updatedUser.profilePicture,        isPremium: updatedUser.isPremium,
+        premiumExpiryDate: updatedUser.premiumExpiryDate,        token: generateToken(updatedUser._id),
       });
     } else {
       res.status(404).json({ message: 'User not found' });

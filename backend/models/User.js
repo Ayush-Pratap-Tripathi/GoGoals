@@ -20,6 +20,14 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a password'],
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    premiumExpiryDate: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

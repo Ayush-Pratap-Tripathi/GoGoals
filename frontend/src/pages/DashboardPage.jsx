@@ -31,7 +31,7 @@ import axios from 'axios';
 import { quotes } from '../data/quotes';
 
 const DashboardPage = () => {
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
 
   // Core Chronological Native Mapping (Resolves Client OS Timezone strictly uniformly matching HTML5 inputs)
   const today = new Date();
@@ -216,6 +216,7 @@ const DashboardPage = () => {
               total={goalStats.daily.total} 
               score={goalStats.daily.score} 
               onClick={() => openModalForCategory('daily')}
+              isPremium={true}
             />
             <StatCard 
               title="This Week" 
@@ -223,6 +224,7 @@ const DashboardPage = () => {
               total={goalStats.weekly.total} 
               score={goalStats.weekly.score} 
               onClick={() => openModalForCategory('weekly')}
+              isPremium={true}
             />
             <StatCard 
               title="This Month" 
@@ -230,6 +232,7 @@ const DashboardPage = () => {
               total={goalStats.monthly.total} 
               score={goalStats.monthly.score} 
               onClick={() => openModalForCategory('monthly')}
+              isPremium={user?.isPremium}
             />
             <StatCard 
               title="This Year" 
@@ -237,6 +240,7 @@ const DashboardPage = () => {
               total={goalStats.yearly.total} 
               score={goalStats.yearly.score} 
               onClick={() => openModalForCategory('yearly')}
+              isPremium={user?.isPremium}
             />
           </div>
 
@@ -308,13 +312,13 @@ const DashboardPage = () => {
 
           {/* Desktop native full charts */}
           <div className="hidden lg:flex w-full flex-col gap-16">
-            <ChartBlock title={weeklyDataNode.title} data={weeklyDataNode.data} onPrevious={() => setWeekOffset(prev => prev - 1)} onNext={() => setWeekOffset(prev => prev + 1)} />
+            <ChartBlock title={weeklyDataNode.title} data={weeklyDataNode.data} onPrevious={() => setWeekOffset(prev => prev - 1)} onNext={() => setWeekOffset(prev => prev + 1)} isPremium={true} />
             <div className="w-full h-[1px] bg-white/5" />
-            <ChartBlock title={monthlyDataNode.title} data={monthlyDataNode.data} onPrevious={() => setMonthOffset(prev => prev - 1)} onNext={() => setMonthOffset(prev => prev + 1)} />
+            <ChartBlock title={monthlyDataNode.title} data={monthlyDataNode.data} onPrevious={() => setMonthOffset(prev => prev - 1)} onNext={() => setMonthOffset(prev => prev + 1)} isPremium={user?.isPremium} />
             <div className="w-full h-[1px] bg-white/5" />
-            <ChartBlock title={yearlyDataNode.title} data={yearlyDataNode.data} onPrevious={() => setYearOffset(prev => prev - 1)} onNext={() => setYearOffset(prev => prev + 1)} />
+            <ChartBlock title={yearlyDataNode.title} data={yearlyDataNode.data} onPrevious={() => setYearOffset(prev => prev - 1)} onNext={() => setYearOffset(prev => prev + 1)} isPremium={user?.isPremium} />
             <div className="w-full h-[1px] bg-white/5" />
-            <ChartBlock title={decadeDataNode.title} data={decadeDataNode.data} onPrevious={() => setDecadeOffset(prev => prev - 1)} onNext={() => setDecadeOffset(prev => prev + 1)} />
+            <ChartBlock title={decadeDataNode.title} data={decadeDataNode.data} onPrevious={() => setDecadeOffset(prev => prev - 1)} onNext={() => setDecadeOffset(prev => prev + 1)} isPremium={user?.isPremium} />
             
             {/* Desktop-only Quote & Logo appended organically beneath charts */}
             <div className="w-full flex flex-col items-center justify-center text-center mt-6">
@@ -350,7 +354,7 @@ const DashboardPage = () => {
         </div>
 
         <div className="hidden lg:flex fixed top-24 left-1/2 -translate-x-1/2 z-50 transition-all duration-500">
-          {scrollPosition >= maxScroll - 50 && maxScroll > 0 && (
+          {scrollPosition > 100 && (
             <button 
               onClick={() => {
                 const mainEl = document.getElementById('dashboard-main');
@@ -427,10 +431,10 @@ const DashboardPage = () => {
               <X className="w-5 h-5" />
             </button>
             <div className="pt-2">
-              {activeChartModal === 'weekly' && <ChartBlock title={weeklyDataNode.title} data={weeklyDataNode.data} onPrevious={() => setWeekOffset(prev => prev - 1)} onNext={() => setWeekOffset(prev => prev + 1)} />}
-              {activeChartModal === 'monthly' && <ChartBlock title={monthlyDataNode.title} data={monthlyDataNode.data} onPrevious={() => setMonthOffset(prev => prev - 1)} onNext={() => setMonthOffset(prev => prev + 1)} />}
-              {activeChartModal === 'yearly' && <ChartBlock title={yearlyDataNode.title} data={yearlyDataNode.data} onPrevious={() => setYearOffset(prev => prev - 1)} onNext={() => setYearOffset(prev => prev + 1)} />}
-              {activeChartModal === 'decade' && <ChartBlock title={decadeDataNode.title} data={decadeDataNode.data} onPrevious={() => setDecadeOffset(prev => prev - 1)} onNext={() => setDecadeOffset(prev => prev + 1)} />}
+              {activeChartModal === 'weekly' && <ChartBlock title={weeklyDataNode.title} data={weeklyDataNode.data} onPrevious={() => setWeekOffset(prev => prev - 1)} onNext={() => setWeekOffset(prev => prev + 1)} isPremium={true} />}
+              {activeChartModal === 'monthly' && <ChartBlock title={monthlyDataNode.title} data={monthlyDataNode.data} onPrevious={() => setMonthOffset(prev => prev - 1)} onNext={() => setMonthOffset(prev => prev + 1)} isPremium={user?.isPremium} />}
+              {activeChartModal === 'yearly' && <ChartBlock title={yearlyDataNode.title} data={yearlyDataNode.data} onPrevious={() => setYearOffset(prev => prev - 1)} onNext={() => setYearOffset(prev => prev + 1)} isPremium={user?.isPremium} />}
+              {activeChartModal === 'decade' && <ChartBlock title={decadeDataNode.title} data={decadeDataNode.data} onPrevious={() => setDecadeOffset(prev => prev - 1)} onNext={() => setDecadeOffset(prev => prev + 1)} isPremium={user?.isPremium} />}
             </div>
           </div>
         </div>

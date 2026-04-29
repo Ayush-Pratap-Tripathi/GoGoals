@@ -1,16 +1,19 @@
 import logo from '../../assets/logo.png';
 import { useContext, useState, useRef, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { UserCircle2, LogOut, Settings, Target, ListChecks } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { UserCircle2, LogOut, Settings, Target, ListChecks, Crown } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import BucketListModal from './BucketListModal';
+import PremiumUpgradeModal from './PremiumUpgradeModal';
 
 const DashboardNavbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isBucketModalOpen, setIsBucketModalOpen] = useState(false);
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   
   // Extract first name dynamically from auth payload (split by space)
@@ -62,9 +65,17 @@ const DashboardNavbar = () => {
 
       {/* Middle: Welcome Text bound to real-time clock evaluation */}
       <div className="flex flex-col items-center">
-        <h2 className="text-lg md:text-xl font-bold tracking-wide italic text-white">
-          <span className="font-[cursive]">Welcome {firstName} ✨</span>
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg md:text-xl font-bold tracking-wide italic text-white">
+            <span className="font-[cursive]">Welcome {firstName} ✨</span>
+          </h2>
+          {user?.isPremium && (
+            <div className="flex items-center gap-1 bg-yellow-400/20 px-2 py-1 rounded-full border border-yellow-400/50">
+              <Crown size={14} className="text-yellow-400" />
+              <span className="text-xs font-semibold text-yellow-300">Premium</span>
+            </div>
+          )}
+        </div>
         <span className="text-xs md:text-sm text-gray-400 font-medium tracking-widest uppercase mt-0.5">
           {weekDay}
         </span>
@@ -95,7 +106,7 @@ const DashboardNavbar = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 15, scale: 0.95 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute right-0 top-[120%] w-56 bg-[#2d3250]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden z-[100] flex flex-col origin-top-right"
+              className="absolute right-0 top-[120%] w-56 bg-[#2d3250]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden z-100 flex flex-col origin-top-right"
             >
               {/* User Metadata Header */}
               <div className="px-4 py-3 border-b border-white/10 bg-white/5">
@@ -135,6 +146,18 @@ const DashboardNavbar = () => {
                   <Settings className="w-4 h-4 text-gray-400" />
                   Edit Profile
                 </button>
+                {!user?.isPremium && (
+                  <button 
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      setIsPremiumModalOpen(true);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-yellow-300 hover:bg-yellow-500/10 hover:text-yellow-200 transition-colors flex items-center gap-3 outline-none border-t border-yellow-500/20"
+                  >
+                    <Crown className="w-4 h-4" />
+                    Upgrade to Premium
+                  </button>
+                )}
                 <button 
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors flex items-center gap-3 outline-none"
@@ -150,6 +173,7 @@ const DashboardNavbar = () => {
       </div>
     </motion.nav>
     <BucketListModal isOpen={isBucketModalOpen} onClose={() => setIsBucketModalOpen(false)} />
+    <PremiumUpgradeModal isOpen={isPremiumModalOpen} onClose={() => setIsPremiumModalOpen(false)} />
     </>
   );
 };
