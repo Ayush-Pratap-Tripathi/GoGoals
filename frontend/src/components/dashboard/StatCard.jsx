@@ -1,26 +1,21 @@
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const StatCard = ({ title, completed = 0, total = 0, score = "0.00", onClick, isPremium = true }) => {
-  const [isShaking, setIsShaking] = useState(false);
-
   const handleLockClick = (e) => {
     e.stopPropagation();
-    setIsShaking(true);
-    setTimeout(() => setIsShaking(false), 600);
-    toast.error('Upgrade to premium to use this feature', {
-      style: { borderRadius: '10px', background: '#292d44', color: '#fff' }
-    });
+    toast.error('Upgrade to premium to access this analytics');
   };
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      onClick={onClick}
-      className={`h-full w-full bg-[#2d3250] border-t-2 border-blue-400 rounded-xl overflow-hidden flex flex-col items-center justify-center py-6 sm:py-8 md:py-12 lg:py-16 shadow-2xl relative min-h-[150px] md:min-h-[220px] lg:min-h-[260px] cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:border-blue-300 transition-all duration-300 group ${!isPremium ? 'blur-sm' : ''} ${isShaking ? 'animate-premium-shake' : ''}`}
+      onClick={!isPremium ? handleLockClick : onClick}
+      className={`h-full w-full bg-[#2d3250] border-t-2 border-blue-400 rounded-xl overflow-hidden flex flex-col items-center justify-center py-6 sm:py-8 md:py-12 lg:py-16 shadow-2xl relative min-h-[150px] md:min-h-[220px] lg:min-h-[260px] cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:border-blue-300 transition-all duration-300 group ${
+        !isPremium ? 'blur-sm' : ''
+      }`}
     >
       <div className="bg-[#292d44]/70 w-full text-center py-2 absolute top-0 text-base md:text-lg font-bold text-gray-200 tracking-wider uppercase shadow-sm">
         {title}
@@ -37,16 +32,17 @@ const StatCard = ({ title, completed = 0, total = 0, score = "0.00", onClick, is
         <span className="text-gray-300 text-sm md:text-base font-medium">Score: <span className="text-white font-bold ml-1">{score}</span></span>
       </div>
 
-      {/* Premium Lock Overlay - Show on all devices */}
+      {/* Lock Overlay for Non-Premium */}
       {!isPremium && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors z-20"
+        <div 
+          className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg cursor-not-allowed hover:bg-black/30 transition-colors"
           onClick={handleLockClick}
         >
-          <Lock className="w-8 h-8 text-white" />
-        </motion.div>
+          <div className="flex flex-col items-center gap-2">
+            <Lock size={32} className="text-yellow-400" />
+            <span className="text-sm font-semibold text-white">Locked</span>
+          </div>
+        </div>
       )}
     </motion.div>
   );

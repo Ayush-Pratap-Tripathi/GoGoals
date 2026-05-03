@@ -19,6 +19,11 @@ coverage
 # Dependencies
 node_modules/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # OS metadata
 .DS_Store
 Thumbs.db

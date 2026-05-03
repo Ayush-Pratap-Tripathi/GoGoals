@@ -1,13 +1,12 @@
 import { Mic, Loader, AlertCircle } from 'lucide-react';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
-  const [isShaking, setIsShaking] = useState(false);
   const { token, user } = useContext(AuthContext);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -17,6 +16,12 @@ const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
 
   // Initialize audio recording
   const startRecording = async () => {
+    // Check if user is premium
+    if (!user?.isPremium) {
+      toast.error('Upgrade to premium to use this feature');
+      return;
+    }
+
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -110,16 +115,6 @@ const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
 
   // Handle touch start (long press)
   const handleMouseDown = () => {
-    // Check if user is premium
-    if (!user?.isPremium) {
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 600);
-      toast.error('Upgrade to premium to use this feature', {
-        style: { borderRadius: '10px', background: '#292d44', color: '#fff' }
-      });
-      return;
-    }
-    
     touchTimeRef.current = Date.now();
     startRecording();
   };
@@ -174,7 +169,7 @@ const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         disabled={isProcessing}
-        className={`absolute bottom-20 md:bottom-24 right-6 md:right-10 w-14 h-14 ${getButtonStyles()} hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white disabled:opacity-70 disabled:cursor-not-allowed ${isShaking ? 'animate-premium-shake' : ''}`}
+        className={`absolute bottom-20 md:bottom-24 right-6 md:right-10 w-14 h-14 ${getButtonStyles()} hover:scale-105 active:scale-95 transition-all outline-none border-none rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] z-50 cursor-pointer text-white disabled:opacity-70 disabled:cursor-not-allowed`}
         title={isRecording ? 'Release to send' : 'Hold to record'}
       >
         {isProcessing ? (
