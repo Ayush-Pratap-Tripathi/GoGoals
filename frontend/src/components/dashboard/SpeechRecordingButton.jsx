@@ -2,12 +2,14 @@ import { Mic, Loader, AlertCircle } from 'lucide-react';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'sonner';
+import usePremiumFeature from '../../hooks/usePremiumFeature';
 
 const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const { token, user } = useContext(AuthContext);
+  const { isPremium, handlePremiumAttempt, elementRef } = usePremiumFeature();
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
@@ -17,8 +19,7 @@ const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
   // Initialize audio recording
   const startRecording = async () => {
     // Check if user is premium
-    if (!user?.isPremium) {
-      toast.error('Upgrade to premium to use this feature');
+    if (!handlePremiumAttempt()) {
       return;
     }
 
@@ -163,6 +164,7 @@ const SpeechRecordingButton = ({ onSpeechDataReceived }) => {
     <div className="relative">
       {/* FLOATING MIC BUTTON */}
       <button
+        ref={elementRef}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
